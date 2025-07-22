@@ -24,6 +24,7 @@ pub struct Refund<'info>{
     pub maker_ata_a:InterfaceAccount<'info , TokenAccount>,
     #[account(
         mut,
+        close= maker,
         has_one = mint_a,
         has_one = maker,
         seeds = [b"escrow",maker.key().as_ref() , escrow.seed.to_le_bytes().as_ref()],
@@ -49,7 +50,7 @@ pub struct Refund<'info>{
 
 impl<'info> Refund<'info> {
     pub fn refund_and_close_vault(&mut self) -> Result<()> {
-
+        msg!("taking refund ..............");
         let seeds = &[
             b"escrow",
             self.maker.to_account_info().key.as_ref(),
@@ -62,7 +63,7 @@ impl<'info> Refund<'info> {
             TransferChecked{
                 from:self.vault.to_account_info(),
                 mint:self.mint_a.to_account_info(),
-                to:self.maker.to_account_info(),
+                to:self.maker_ata_a.to_account_info(),
                 authority:self.escrow.to_account_info(),
             },
             signer_seeds

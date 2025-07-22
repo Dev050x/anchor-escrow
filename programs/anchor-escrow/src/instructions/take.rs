@@ -37,7 +37,8 @@ pub struct Take<'info>{
     )]
     pub taker_ata_b:InterfaceAccount<'info , TokenAccount>,
     #[account(
-        mut,
+        init_if_needed,
+        payer = taker,
         associated_token::mint = mint_b,
         associated_token::authority=maker,
         associated_token::token_program = token_program
@@ -72,6 +73,7 @@ pub struct Take<'info>{
 impl<'info> Take<'info>{
     //taker -> maker(mintb)
     pub fn transfer_to_maker(&mut self) -> Result<()>{ 
+        msg!("transfering to maker..........................");
         let cpiContext = CpiContext::new(self.token_program.to_account_info(), TransferChecked{
             from:self.taker_ata_b.to_account_info(),
             mint:self.mint_b.to_account_info(),
@@ -84,8 +86,7 @@ impl<'info> Take<'info>{
 
     //transferign mint_a to taker & closign vault account & escrow will be auto close(you can see in Accounts(above) bcz owned by this program)
     pub fn transfer_to_taker_and_close_account(&mut self) -> Result<()> {
-
-
+        msg!("transfering to maker..........................");
         let seeds = &[&b"escrow"[..] , self.maker.to_account_info().key.as_ref() , &self.escrow.seed.to_le_bytes() ,  &[self.escrow.bump]];
         let sigenr_seeds = &[&seeds[..]];
 

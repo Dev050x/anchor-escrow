@@ -69,16 +69,18 @@ impl<'info> Make<'info> {
     }
 
     pub fn deposit(&mut self , deposit:u64) -> Result<()> {
-
+        msg!("inside the deposit....");
 
         let cpi_context =CpiContext::new(self.token_program.to_account_info(), TransferChecked{
-            from:self.maker.to_account_info(),
-            mint:self.vault.to_account_info(),
+            from:self.maker_ata_a.to_account_info(),
+            mint:self.mint_a.to_account_info(),
             to:self.vault.to_account_info(),
             authority:self.maker.to_account_info()
         });
 
-        transfer_checked(cpi_context, deposit, self.mint_a.decimals);
+        transfer_checked(cpi_context, deposit, self.mint_a.decimals)?;
+        msg!("Deposit of {} tokens from {}", deposit, self.maker.key());
         Ok(())
     }
 }
+
